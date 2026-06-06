@@ -1,0 +1,88 @@
+{
+    "description": "Master produk menu.",
+    "grain": "1 baris per produk",
+    "primary_key": "id_produk",
+    "columns": {
+        "id_produk": "ID produk P001-P021.",
+        "nama_produk": "Nama menu.",
+        "kategori": "Kategori: kopi, non_kopi, makanan_ringan.",
+        "varian": "Varian: panas, dingin, botolan, makanan.",
+        "ukuran": "Ukuran menu.",
+        "harga_dasar": "Harga dasar produk dalam rupiah."
+    },
+    "row_count": 21,
+    "dtypes": {
+        "id_produk": "object",
+        "nama_produk": "object",
+        "kategori": "object",
+        "varian": "object",
+        "ukuran": "object",
+        "harga_dasar": "int64"
+    },
+    "enum_values": {
+        "id_produk": [
+            "P001",
+            "P002",
+            "P003",
+            "P004",
+            "P005",
+            "P006",
+            "P007",
+            "P008",
+            "P009",
+            "P010",
+            "P011",
+            "P012",
+            "P013",
+            "P014",
+            "P015",
+            "P016",
+            "P017",
+            "P018",
+            "P019",
+            "P020",
+            "P021"
+        ],
+        "nama_produk": [
+            "Americano Hot",
+            "Americano Ice",
+            "Cafe Latte Hot",
+            "Cafe Latte Ice",
+            "Cappuccino Hot",
+            "Cappuccino Ice",
+            "Chocolate",
+            "Cold Brew",
+            "Croissant",
+            "Espresso",
+            "Kentang Goreng",
+            "Kopi Botolan 1000ml",
+            "Kopi Botolan 500ml",
+            "Kopi Susu Gula Aren Large",
+            "Kopi Susu Gula Aren Regular",
+            "Lemon Tea",
+            "Matcha Latte",
+            "Mineral Water",
+            "Pisang Goreng",
+            "Roti Bakar Coklat",
+            "Roti Bakar Keju"
+        ],
+        "kategori": [
+            "kopi",
+            "makanan_ringan",
+            "non_kopi"
+        ],
+        "varian": [
+            "botolan",
+            "dingin",
+            "makanan",
+            "panas"
+        ],
+        "ukuran": [
+            "1000ml",
+            "500ml",
+            "large",
+            "regular",
+            "satuan"
+        ]
+    }
+}
