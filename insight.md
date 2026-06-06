@@ -13,12 +13,12 @@ Menyimpan informasi utama mengenai produk jadi yang dijual.
 | Nama Field | Tipe Data | Atribut | Keterangan |
 | --- | --- | --- | --- |
 | `id` | INT | PK, Auto Increment | ID internal database |
-| `kode_produk` | VARCHAR(50) | UNIQUE, INDEX | ID Bisnis (misal: PROD-001), di-*mapping* sebagai `id_produk` di tabel resep |
-| `nama_produk` | VARCHAR(150) | NOT NULL | Nama menu/produk |
-| `kategori` | VARCHAR(100) |  | Kategori (Coffee, Non-Coffee, Pastry, dll) |
-| `varian` | VARCHAR(100) |  | Varian rasa/tipe |
-| `ukuran` | VARCHAR(50) |  | Ukuran (Regular, Large, 250ml, dll) |
-| `harga_dasar` | DECIMAL(15,2) | NOT NULL | Harga modal/HPP dasar produk |
+| `id_produk` | VARCHAR(50) | UNIQUE, INDEX | ID produk P001-P021. |
+| `nama_produk` | VARCHAR(150) | NOT NULL | Nama menu. |
+| `kategori` | ENUM('kopi', 'makanan_ringan', 'non_kopi') |  | Kategori: kopi, non_kopi, makanan_ringan. |
+| `varian` | ENUM('botolan', 'dingin', 'makanan', 'panas') |  | Varian: panas, dingin, botolan, makanan. |
+| `ukuran` | ENUM('1000ml', '500ml', 'large', 'regular', 'satuan') |  | Ukuran menu. |
+| `harga_dasar` | DECIMAL(15,2) | NOT NULL | Harga dasar produk dalam rupiah. |
 | `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Waktu data dibuat |
 | `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Waktu data diubah |
 
@@ -29,15 +29,17 @@ Menyimpan profil dasar dari setiap bahan mentah.
 | Nama Field | Tipe Data | Atribut | Keterangan |
 | --- | --- | --- | --- |
 | `id` | INT | PK, Auto Increment | ID internal database |
-| `kode_bahan` | VARCHAR(50) | UNIQUE, INDEX | ID Bisnis (misal: B001), di-*mapping* sebagai `id_bahan` |
-| `nama_bahan` | VARCHAR(150) | NOT NULL | Nama bahan baku (Kopi Arabika, Susu UHT, dll) |
-| `satuan` | VARCHAR(20) | NOT NULL | Satuan ukuran (gram, ml, pcs) |
-| `biaya_per_satuan` | DECIMAL(15,2) |  | Harga beli rata-rata per satuan |
-| `jenis_pemasok` | VARCHAR(100) |  | Kategori pemasok (Lokal, Distributor Utama, dll) |
-| `umur_simpan_belum_dibuka_hari` | INT |  | Masa kedaluwarsa sejak datang (dalam hari) |
-| `umur_simpan_setelah_dibuka_hari` | INT |  | Masa kedaluwarsa setelah segel dibuka (dalam hari) |
-| `jenis_penyimpanan` | VARCHAR(100) |  | Kondisi simpan (Chiller, Suhu Ruang, Freezer) |
-| `titik_pemesanan_ulang` | DECIMAL(12,3) |  | *Safety stock* / Batas minimum untuk re-order |
+| `id_bahan` | VARCHAR(50) | UNIQUE, INDEX | ID bahan B001 dst. |
+| `nama_bahan` | VARCHAR(150) | NOT NULL | Nama bahan atau packaging. |
+| `satuan` | ENUM('gram', 'ml', 'pcs') | NOT NULL | Satuan: gram, ml, pcs. |
+| `biaya_per_satuan` | DECIMAL(15,2) |  | Harga bahan per satuan dalam rupiah. |
+| `jenis_pemasok` | ENUM('pasar_tradisional', 'pemasok_es', 'pemasok_umum', 'roastery_lokal', 'toko_kemasan') |  | Kategori pemasok: roastery_lokal, pemasok_umum, pasar_tradisional, toko_kemasan, pemasok_es, produksi_sendiri. |
+| `umur_simpan_belum_dibuka_hari` | INT |  | Umur simpan batch sebelum dibuka. |
+| `umur_simpan_setelah_dibuka_hari` | INT |  | Umur simpan setelah dibuka. |
+| `jenis_penyimpanan` | ENUM('beku', 'dingin', 'dingin_setelah_dibuka', 'kering', 'suhu_ruang') |  | Cara simpan bahan. |
+| `titik_pemesanan_ulang` | DECIMAL(12,3) |  | Batas minimum stok untuk restock alert. |
+| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Waktu data dibuat |
+| `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Waktu data diubah |
 
 #### Tabel: `resep_produk`
 
@@ -46,9 +48,9 @@ Menghubungkan produk dengan bahan baku yang dibutuhkan (*Many-to-Many Relationsh
 | Nama Field | Tipe Data | Atribut | Keterangan |
 | --- | --- | --- | --- |
 | `id` | INT | PK, Auto Increment | ID internal database |
-| `id_produk` | VARCHAR(50) | FK (`produk.kode_produk`) | Kode produk terkait |
-| `id_bahan` | VARCHAR(50) | FK (`bahan_baku.kode_bahan`) | Kode bahan baku yang digunakan |
-| `jumlah_dibutuhkan` | DECIMAL(12,3) | NOT NULL | Jumlah bahan baku untuk 1 porsi produk |
+| `id_produk` | VARCHAR(50) | FK (`produk.id_produk`) | Produk yang membutuhkan bahan. |
+| `id_bahan` | VARCHAR(50) | FK (`bahan_baku.id_bahan`) | Bahan yang digunakan. |
+| `jumlah_dibutuhkan` | DECIMAL(12,3) | NOT NULL | Jumlah bahan untuk 1 unit produk, mengikuti satuan bahan. |
 
 ---
 
@@ -60,18 +62,21 @@ Mencatat setiap kali ada bahan baku masuk ke gudang beserta informasi *batch* da
 
 | Nama Field | Tipe Data | Atribut | Keterangan |
 | --- | --- | --- | --- |
-| `id_penerimaan` | VARCHAR(50) | PK | ID Transaksi Penerimaan (misal: RCV000001) |
-| `tanggal_penerimaan` | DATE | NOT NULL | Tanggal bahan diterima di gudang |
-| `id_bahan` | VARCHAR(50) | FK (`bahan_baku.kode_bahan`) | Kode bahan baku yang diterima |
-| `jumlah_diterima` | DECIMAL(12,3) | NOT NULL | Jumlah awal yang masuk (cth: 87417.074) |
+| `id` | INT | PK, Auto Increment | ID internal database |
+| `id_penerimaan` | VARCHAR(50) | UNIQUE, INDEX | ID penerimaan stok. |
+| `tanggal_penerimaan` | DATE | NOT NULL | Tanggal bahan masuk. |
+| `id_bahan` | VARCHAR(50) | FK (`bahan_baku.id_bahan`) | Bahan yang diterima. |
+| `jumlah_diterima` | DECIMAL(12,3) | NOT NULL | Jumlah diterima sesuai satuan bahan. |
 | **`sisa_stok_batch`** | DECIMAL(12,3) | NOT NULL | **PENTING UNTUK FIFO:** Sisa riil *batch* ini yang bisa dipakai. Nilai berkurang saat terjual/expired |
-| `biaya_per_satuan` | DECIMAL(15,2) | NOT NULL | Harga beli per satuan pada transaksi ini |
-| `nama_pemasok` | VARCHAR(150) |  | Nama supplier/vendor |
-| `id_batch` | VARCHAR(50) | INDEX | Kode produksi/lot dari supplier (misal: BAT000001) |
-| `tanggal_dibuka` | DATE | NULLABLE | Diisi tanggal saat segel bahan pertama kali dibuka |
-| `tanggal_expired_belum_dibuka` | DATE | NOT NULL | Tanggal expired standar |
-| `tanggal_expired_setelah_dibuka` | DATE | NULLABLE | Hasil hitung: `tanggal_dibuka` + `umur_simpan_setelah_dibuka_hari` |
-| `tanggal_expired_efektif` | DATE | NOT NULL | Tanggal terdekat antara belum/setelah dibuka. Menjadi acuan utama sistem |
+| `biaya_per_satuan` | DECIMAL(15,2) | NOT NULL | Biaya batch per satuan. |
+| `nama_pemasok` | ENUM('Grosir Bahan Tamalanrea', 'Pasar Daya Makassar', 'Roastery Lokal Makassar', 'Supplier Es Batu Makassar', 'Toko Kemasan Perintis') |  | Nama pemasok sintetis. |
+| `id_batch` | VARCHAR(50) | INDEX | ID batch stok. |
+| `tanggal_dibuka` | DATE | NULLABLE | Tanggal batch dibuka; kosong jika belum dibuka. |
+| `tanggal_expired_belum_dibuka` | DATE | NOT NULL | Expired jika belum dibuka. |
+| `tanggal_expired_setelah_dibuka` | DATE | NULLABLE | Expired setelah dibuka. |
+| `tanggal_expired_efektif` | DATE | NOT NULL | Tanggal expired final yang dipakai. |
+| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Waktu data dibuat |
+| `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Waktu data diubah |
 
 #### Tabel: `snapshot_stok_harian`
 
@@ -79,20 +84,23 @@ Tempat penyimpanan rangkuman stok harian hasil kalkulasi otomatis sistem (*Cron 
 
 | Nama Field | Tipe Data | Atribut | Keterangan |
 | --- | --- | --- | --- |
-| `tanggal` | DATE | PK (Composite) | Tanggal pencatatan log (Y-M-D) |
-| `id_bahan` | VARCHAR(50) | PK (Composite), FK | Kode bahan baku yang dicatat |
-| `stok_awal` | DECIMAL(12,3) | NOT NULL | Sisa `stok_akhir` hari sebelumnya |
-| `stok_masuk` | DECIMAL(12,3) | DEFAULT 0 | Total dari `jumlah_diterima` di tabel penerimaan hari ini |
-| `stok_terpakai` | DECIMAL(12,3) | DEFAULT 0 | Total bahan yang terpakai untuk pesanan hari ini |
-| `stok_terbuang` | DECIMAL(12,3) | DEFAULT 0 | Bahan yang rusak/hilang/otomatis dibuang karena *expired* |
-| `stok_akhir` | DECIMAL(12,3) | NOT NULL | Rumus: `stok_awal` + `stok_masuk` - `stok_terpakai` - `stok_terbuang` |
-| `flag_stok_habis` | TINYINT(1) | DEFAULT 0 | 1 jika `stok_akhir` = 0, berguna untuk alert cepat |
-| `flag_hampir_expired` | TINYINT(1) | DEFAULT 0 | 1 jika ada *batch* aktif yang mendekati `tanggal_expired_efektif` |
+| `id` | INT | PK, Auto Increment | ID internal database |
+| `tanggal` | DATE | NOT NULL, INDEX | Tanggal snapshot. |
+| `id_bahan` | VARCHAR(50) | FK (`bahan_baku.id_bahan`) | Bahan yang diukur. |
+| `stok_awal` | DECIMAL(12,3) | NOT NULL | Stok awal hari. |
+| `stok_masuk` | DECIMAL(12,3) | DEFAULT 0 | Stok masuk hari itu. |
+| `stok_terpakai` | DECIMAL(12,3) | DEFAULT 0 | Stok dipakai dari transaksi x resep. |
+| `stok_terbuang` | DECIMAL(12,3) | DEFAULT 0 | Stok waste/expired/spoilage sintetis. |
+| `stok_akhir` | DECIMAL(12,3) | NOT NULL | Stok akhir hari. |
+| `flag_stok_habis` | TINYINT(1) | DEFAULT 0 | 1 jika stok akhir di bawah/mendekati titik pemesanan ulang. |
+| `flag_hampir_expired` | TINYINT(1) | DEFAULT 0 | 1 jika ada risiko mendekati expired. |
+| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Waktu data dibuat |
+| `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Waktu data diubah |
 
 ---
 
 
 ### Tips Relasi untuk Developer:
 
-1. **PK Composite pada Snapshot:** Tabel `snapshot_stok_harian` menggunakan *Composite Primary Key* gabungan dari `tanggal` dan `id_bahan`. Artinya, kombinasi data `2024-07-01` + `B001` tidak akan bisa terduplikasi.
+1. **Unique Constraint pada Snapshot:** Tabel `snapshot_stok_harian` menggunakan `id` sebagai *Primary Key* tunggal, namun memiliki *Composite Unique Key/Constraint* gabungan dari `tanggal` dan `id_bahan`. Artinya, kombinasi data `2024-07-01` + `B001` tidak akan bisa terduplikasi.
 2. **Skema Deserialisasi FIFO:** Saat ada transaksi masuk ke `detail_penjualan`, sistem aplikasi Anda harus melihat ke tabel `penerimaan_stok`, mengurutkan berdasarkan `tanggal_expired_efektif ASC` yang memiliki `sisa_stok_batch > 0`, lalu memotong angka pada `sisa_stok_batch` tersebut sebanding dengan perkalian `jumlah_terjual` $\times$ `jumlah_dibutuhkan`.
