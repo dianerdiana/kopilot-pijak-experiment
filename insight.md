@@ -91,28 +91,6 @@ Tempat penyimpanan rangkuman stok harian hasil kalkulasi otomatis sistem (*Cron 
 
 ---
 
-### 3. Kelompok Transaksi Penjualan (Direkomendasikan)
-
-*Tabel ini opsional, namun sistem Anda memerlukan data penjualan ini untuk memicu pemotongan resep harian secara otomatis ke dalam `stok_terpakai`.*
-
-#### Tabel: `penjualan`
-
-| Nama Field | Tipe Data | Atribut | Keterangan |
-| --- | --- | --- | --- |
-| `id_penjualan` | VARCHAR(50) | PK | Nomor struk/invoice (misal: INV-20260606-001) |
-| `tanggal_penjualan` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Waktu transaksi kasir |
-| `total_harga` | DECIMAL(15,2) |  | Total bayar konsumen |
-
-#### Tabel: `detail_penjualan`
-
-| Nama Field | Tipe Data | Atribut | Keterangan |
-| --- | --- | --- | --- |
-| `id` | INT | PK, Auto Increment | ID unik baris |
-| `id_penjualan` | VARCHAR(50) | FK (`penjualan.id_penjualan`) | Menghubungkan ke struk utama |
-| `id_produk` | VARCHAR(50) | FK (`produk.kode_produk`) | Kode menu yang dibeli |
-| `jumlah_terjual` | INT | NOT NULL | Kuantitas menu yang dibeli (cth: 2 cup) |
-
----
 
 ### Tips Relasi untuk Developer:
 
