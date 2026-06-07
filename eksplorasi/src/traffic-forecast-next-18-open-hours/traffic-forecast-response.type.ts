@@ -1,4 +1,4 @@
-export interface Root {
+export interface TrafficForecastResponse {
   request_id: string;
   model: string;
   cutoff_time: string;
@@ -6,12 +6,12 @@ export interface Root {
   history_open_hours_used: number;
   current_promo_context_source: string;
   future_promo_context_source: string;
-  warnings: any[];
-  predictions: Prediction[];
+  warnings: string[];
+  predictions: TrafficPrediction[];
   peak_window: PeakWindow;
 }
 
-export interface Prediction {
+export interface TrafficPrediction {
   prediction_time: string;
   prediction_hour: number;
   forecast_open_slot: number;
@@ -29,3 +29,5 @@ export interface PeakWindow {
   end_time: string;
   max_predicted_order_count: number;
 }
+
+export type Root = TrafficForecastResponse;
