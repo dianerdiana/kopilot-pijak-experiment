@@ -15,13 +15,13 @@ datasource db {
 
 // Enums
 enum UserRole {
-  SUPER_ADMIN
-  MANAGER
+  SuperAdmin @map("super_admin")
+  Manager    @map("manager")
 }
 
 enum UserStatus {
-  ACTIVE
-  INACTIVE
+  Active
+  Inactive
 }
 
 enum StockUnit {
@@ -31,67 +31,133 @@ enum StockUnit {
 }
 
 enum PredictionType {
-  REVENUE_FORECAST
-  TRAFFIC_FORECAST
-  DEMAND_FORECAST
-  DEMAND_RECOMMENDATION
+  RevenueForecast      @map("revenue_forecast")
+  TrafficForecast      @map("traffic_forecast")
+  DemandForecast       @map("demand_forecast")
+  DemandRecommendation @map("demand_recommendation")
 }
 
 enum ProductCategory {
-  Coffee    @map("KOPI")
-  NonCoffee @map("NON_KOPI")
-  Snack     @map("MAKANAN_RINGAN")
+  Coffee    @map("kopi")
+  NonCoffee @map("non_kopi")
+  Snack     @map("makanan_ringan")
 }
 
 enum ProductVariant {
-  Bottle @map("BOTOL")
-  Cool   @map("DINGIN")
-  Hot    @map("PANAS")
-  Food   @map("MAKANAN")
+  Bottle @map("botol")
+  Cool   @map("dingin")
+  Hot    @map("panas")
+  Food   @map("makanan")
 }
 
 enum ProductSize {
-  Large         @map("BESAR")
-  Regular       @map("REGULAR")
-  Single        @map("SATUAN")
-  BottleRegular @map("500ML")
-  BottleLarge   @map("1000ML")
+  Large         @map("besar")
+  Regular       @map("regular")
+  Single        @map("satuan")
+  BottleRegular @map("500ml")
+  BottleLarge   @map("1000ml")
 }
 
 enum SupplierType {
-  TraditionalMarket @map("PASAR_TRADISIONAL")
-  IceSupplier       @map("PEMASOK_ES")
-  GeneralSupplier   @map("PEMASOK_UMUM")
-  LocalRoastery     @map("ROASTERY_LOKAL")
-  PackagingStore    @map("TOKO_KEMASAN")
+  TraditionalMarket @map("pasar_tradisional")
+  IceSupplier       @map("pemasok_es")
+  GeneralSupplier   @map("pemasok_umum")
+  LocalRoastery     @map("roastery_lokal")
+  PackagingStore    @map("toko_kemasan")
 }
 
 enum StorageType {
-  Frozen                   @map("BEKU")
-  Refrigerated             @map("DINGIN")
-  RefrigeratedAfterOpening @map("DINGIN_SETELAH_DIBUKA")
-  RoomTemperature          @map("SUHU_RUANG")
-  Dry                      @map("KERING")
+  Frozen                   @map("beku")
+  Refrigerated             @map("dingin")
+  RefrigeratedAfterOpening @map("dingin_setelah_dibuka")
+  RoomTemperature          @map("suhu_ruang")
+  Dry                      @map("kering")
 }
 
 enum StockStatus {
-  Sufficient @map("AMAN")
-  Restock    @map("RESTOCK")
-  Low        @map("ALERT")
-  OutOfStock @map("HABIS")
+  Sufficient @map("aman")
+  Restock    @map("restock")
+  Low        @map("alert")
+  OutOfStock @map("habis")
+}
+
+enum PaymentMethod {
+  Cash    @map("tunai")
+  NonCash @map("qris")
+}
+
+enum OrderType {
+  DineIn   @map("makan_di_tempat")
+  TakeAway @map("bawa_pulang")
+  Delivery @map("pengantaran")
+}
+
+enum SalesChannel {
+  Offline @map("offline")
+  Online  @map("online")
+}
+
+enum CustomerSegment {
+  TeacherWorker    @map("dosen_staff")
+  Student          @map("mahasiswa")
+  LocalWorker      @map("pekerja_sekitar")
+  DeliveryCustomer @map("pelanggan_delivery")
+  LocalResident    @map("warga_sekitar")
+}
+
+enum DiscountType {
+  Event         @map("acara")
+  Bundling      @map("bundling")
+  Payday        @map("gajian")
+  DeliveryPromo @map("promo_pengantaran")
+  None          @map("tidak_ada")
+}
+
+enum PromoStatus {
+  Active    @map("aktif")
+  Inactive  @map("tidak_aktif")
+  Upcoming  @map("akan_datang")
+  Completed @map("selesai")
+}
+
+enum NotificationType {
+  PeakHourAlert @map("peringatan_jam_sibuk")
+  StockAlert    @map("peringatan_stok")
+  Report        @map("laporan")
+}
+
+enum NotificationChannel {
+  WebApp @map("web_app")
+  Email  @map("email")
+  Both   @map("both")
+}
+
+enum NotificationPriority {
+  Low    @map("rendah")
+  Medium @map("sedang")
+  High   @map("tinggi")
+}
+
+enum NotificationStatus {
+  Active   @map("aktif")
+  Expired  @map("kedaluwarsa")
+  Resolved @map("selesai")
+  Archived @map("diarsipkan")
 }
 
 // Models
 model User {
-  id        String     @id @default(uuid())
-  name      String
-  email     String     @unique
-  password  String     @map("password_hash")
-  role      UserRole
-  status    UserStatus
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
-  deletedAt DateTime?  @map("deleted_at")
+  id                String             @id @default(uuid())
+  userId            String             @unique @map("id_user")
+  name              String
+  email             String             @unique
+  password          String             @map("password_hash")
+  role              UserRole
+  status            UserStatus
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  deletedAt         DateTime?          @map("deleted_at")
+  notificationReads NotificationRead[]
 
   @@map("users")
 }
@@ -109,6 +175,7 @@ model Product {
   updatedAt DateTime        @updatedAt @map("updated_at")
 
   productIngredients ProductIngredient[]
+  transactionDetails TransactionDetail[]
 
   @@unique([variant, category, size])
   @@index([productId])
@@ -121,8 +188,8 @@ model ProductIngredient {
   stockId         String  @map("stock_id")
   quantityPerUnit Decimal @map("quantity_per_unit") @db.Decimal(10, 3)
 
-  product Product @relation(fields: [productId], references: [id])
-  stock   Stock   @relation(fields: [stockId], references: [id])
+  product Product @relation(fields: [productId], references: [productId])
+  stock   Stock   @relation(fields: [stockId], references: [stockId])
 
   @@unique([productId, stockId])
   @@map("product_ingredients")
@@ -142,14 +209,16 @@ model RawMaterial {
   createdAt             DateTime     @default(now()) @map("created_at")
   updatedAt             DateTime     @updatedAt @map("updated_at")
 
-  stocks Stock[]
+  stocks        Stock[]
+  stockReceipts StockReceipts[]
 
   @@map("raw_materials")
 }
 
 model Stock {
   id              String      @id @default(uuid())
-  materialId      String
+  stockId         String      @unique @map("id_stok")
+  materialId      String      @map("id_bahan")
   currentQuantity Int         @map("current_quantity")
   minimumQuantity Int         @map("minimum_quantity")
   resilienceDays  Int         @map("ketahanan_hari")
@@ -157,8 +226,7 @@ model Stock {
   lastUpdated     DateTime    @map("last_updated")
 
   productIngredients  ProductIngredient[]
-  rawMaterial         RawMaterial?         @relation(fields: [rawMaterialId], references: [id])
-  rawMaterialId       String?
+  rawMaterial         RawMaterial          @relation(fields: [materialId], references: [materialId])
   dailyStockSnapshots DailyStockSnapshot[]
 
   @@map("stocks")
@@ -179,6 +247,8 @@ model StockReceipts {
   expiryOpenedDate   DateTime? @map("tanggal_expired_setelah_dibuka") @db.Date
   expiryDate         DateTime? @map("tanggal_expired_efektif") @db.Date
 
+  rawMaterial RawMaterial @relation(fields: [materialId], references: [materialId])
+
   @@map("stock_receipts")
 }
 
@@ -194,23 +264,128 @@ model DailyStockSnapshot {
   flagNearExpiry Boolean  @map("flag_hampir_expired")
   snapshotDate   DateTime @map("tanggal_snapshot") @db.Date
 
-  stock Stock @relation(fields: [stockId], references: [id])
+  stock Stock @relation(fields: [stockId], references: [stockId])
 
   @@map("daily_stock_snapshots")
 }
 
+model Order {
+  id                       String              @id @default(uuid())
+  orderId                  String              @unique @map("id_pesanan")
+  orderTime                DateTime            @map("waktu_pesanan")
+  paymentMethod            PaymentMethod       @map("metode_pembayaran")
+  orderType                OrderType           @map("jenis_pesanan")
+  salesChannel             SalesChannel        @map("kanal_penjualan")
+  estimatedCustomerSegment CustomerSegment     @map("segmen_pelanggan_estimasi")
+  createdAt                DateTime            @default(now()) @map("created_at")
+  updatedAt                DateTime            @updatedAt @map("updated_at")
+  transactionDetails       TransactionDetail[]
+
+  @@map("orders")
+}
+
+model TransactionDetail {
+  id              String       @id @default(uuid())
+  transactionId   String       @unique @map("id_transaksi")
+  orderId         String       @map("id_pesanan")
+  productId       String       @map("id_produk")
+  quantity        Int          @map("jumlah")
+  price           Decimal      @map("harga_satuan") @db.Decimal(10, 2)
+  discount        Decimal      @map("jumlah_diskon") @db.Decimal(10, 2)
+  discountApplied Boolean      @default(false) @map("diskon_diterapkan")
+  discountType    DiscountType @default(None) @map("jenis_diskon")
+  totalPrice      Decimal      @map("total_harga") @db.Decimal(10, 2)
+  promotionId     String       @default("tidak_ada") @map("id_promo")
+
+  order   Order   @relation(fields: [orderId], references: [orderId])
+  product Product @relation(fields: [productId], references: [productId])
+
+  @@map("transaction_details")
+}
+
 model Prediction {
   id                String         @id @default(uuid())
-  storeId           String         @map("store_id")
   type              PredictionType
   cutoffDate        DateTime       @map("cutoff_date") @db.Date
   cutoffHour        Int?           @map("cutoff_hour")
+  forecastDays      Int            @map("forecast_days")
   modelVersion      String         @map("model_version")
   responseData      Json           @map("response_data")
   normalizedSummary Json           @map("normalized_summary")
-  createdAt         DateTime       @default(now()) @map("created_at")
-  updatedAt         DateTime       @updatedAt @map("updated_at")
+  generatedAt       DateTime       @default(now()) @map("generated_at")
 
-  @@unique([storeId, type, cutoffDate, cutoffHour])
   @@map("predictions")
+}
+
+model WeatherContext {
+  id              Int      @id @default(autoincrement())
+  dateTime        DateTime @default(now()) @map("waktu_jam")
+  condition       String   @map("kondisi_cuaca")
+  ramadhanPeriode Boolean  @map("periode_ramadhan")
+
+  @@map("weather_context")
+}
+
+model DailyContext {
+  id                Int      @id @default(autoincrement())
+  date              DateTime @default(now()) @map("tanggal")
+  isHoliday         Boolean  @map("apakah_libur")
+  isWeekend         Boolean  @map("apakah_akhir_pekan")
+  isRamadhanPeriode Boolean  @map("apakah_ramadhan")
+  isPaydayPeriode   Boolean  @map("apakah_periode_gajian")
+  eventName         String   @default("tidak_ada") @map("nama_event")
+  eventType         String   @default("tidak_ada") @map("jenis_event")
+
+  @@map("daily_context")
+}
+
+model Notification {
+  id         String               @id @default(uuid())
+  storeId    String               @map("store_id")
+  type       NotificationType
+  title      String
+  message    String
+  payload    Json
+  channel    NotificationChannel
+  priority   NotificationPriority
+  status     NotificationStatus
+  validUntil DateTime             @map("valid_until")
+  createdAt  DateTime             @default(now()) @map("created_at")
+  updatedAt  DateTime             @updatedAt @map("updated_at")
+
+  notificationReads NotificationRead[]
+
+  @@map("notifications")
+}
+
+model NotificationRead {
+  id             String   @id @default(uuid())
+  notificationId String   @map("notification_id")
+  userId         String   @map("user_id")
+  readAt         DateTime @map("read_at")
+
+  notification Notification @relation(fields: [notificationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([notificationId, userId])
+  @@map("notification_reads")
+}
+
+model PromoCampaigns {
+  id             String       @id @default(uuid())
+  promoId        String       @unique @map("id_promo")
+  name           String       @map("nama_promo")
+  startDate      DateTime     @map("tanggal_mulai") @db.Date
+  endDate        DateTime     @map("tanggal_selesai") @db.Date
+  discountType   DiscountType @map("jenis_diskon")
+  idProducts     String       @map("id_produk_target") // Sparated by semicoolon, e.g. "prod1;prod2;prod3"
+  categoryTarget String       @map("kategori_target") // if all categories, set to "semua"
+  discountValue  Decimal      @map("nilai_diskon") @db.Decimal(10, 2)
+  salesChannel   SalesChannel @map("kanal_penjualan")
+  minimumUnit    Int          @map("minimal_pembelian")
+  status         PromoStatus  @map("status_promo")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@map("promo_campaigns")
 }
