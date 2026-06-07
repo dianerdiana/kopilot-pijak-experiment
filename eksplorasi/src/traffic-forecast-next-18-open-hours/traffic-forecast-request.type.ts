@@ -1,4 +1,4 @@
-export interface Root {
+export interface TrafficForecastRequest {
   request_id: string;
   cutoff_time: string;
   hourly_history: HourlyHistory[];
@@ -33,3 +33,5 @@ export interface CalendarContext {
   active_promo_mean_discount: number;
   periode_ramadan: string;
 }
+
+export type Root = TrafficForecastRequest;
