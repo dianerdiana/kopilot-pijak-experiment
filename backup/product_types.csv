@@ -1,9 +1,0 @@
-product_name,quantity,unit,is_raw_material
-Brewed Black tea,1000,ml,0
-Black tea,250,g,1
-Brewed Green tea,1000,ml,0
-Green tea,250,g,1
-Brewed Chai tea,1000,ml,0
-Chai tea,250,g,1
-Brewed Herbal tea,1000,ml,0
-Herbal tea,250,g,1
