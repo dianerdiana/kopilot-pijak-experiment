@@ -27,7 +27,7 @@ Hasil prediksi digunakan untuk:
 - perencanaan operasional
 - perbandingan forecast dan actual revenue
 
-Hasil prediksi disimpan ke tabel `predictions` melalui model `Prediction` pada `schema.prisma` dengan tipe `REVENUE_FORECAST`.
+Hasil prediksi disimpan ke tabel `predictions` melalui model `Prediction` pada `schema.prisma` dengan tipe `RevenueForecast`.
 
 ---
 
@@ -63,7 +63,7 @@ Hasil prediksi disimpan ke tabel `predictions` melalui model `Prediction` pada `
 4. Revenue historis dihitung dan diaggregasi per hari.
 5. Data dimapping ke format request ML.
 6. Request dikirim ke API Revenue Forecast.
-7. Response disimpan ke model `Prediction` (type `REVENUE_FORECAST`).
+7. Response disimpan ke model `Prediction` (type `RevenueForecast`).
 8. Ringkasan hasil dibuat untuk frontend.
 9. Dashboard revenue menggunakan hasil prediksi terbaru.
 
@@ -122,6 +122,11 @@ Cron-job menghasilkan:
 - `daily_revenue_history`
 - `calendar_context`
 
+Struktur data utama yang dikirim:
+
+- `daily_revenue_history` berisi histori revenue harian dengan field `tanggal`, `revenue`, `order_count`, `items_sold`, dan `discount_total`
+- `calendar_context` berisi context tanggal ke depan dengan field `tanggal`, `is_holiday`, `is_ramadhan_periode`, `is_payday_periode`, `has_active_promo`, `active_promo_count`, dan `active_promo_mean_discount`
+
 ---
 
 # 6. Mapping Database ke Request ML
@@ -135,19 +140,34 @@ Sumber:
 - `TransactionDetail`
 - `Order`
 
+Field Prisma yang dipakai:
+
+- `Order.orderTime`
+- `Order.orderId`
+- `TransactionDetail.totalPrice`
+- `TransactionDetail.quantity`
+- `TransactionDetail.discount`
+
 Cara mengambil:
-SELECT
-DATE(o.waktu_pesanan) as tanggal,
-SUM(td.total_harga) as revenue,
-COUNT(DISTINCT o.id_pesanan) as order_count,
-SUM(td.jumlah) as items_sold,
-SUM(td.jumlah_diskon) as discount_total
-FROM transaction_details td
-JOIN orders o ON td.id_pesanan = o.id_pesanan
-WHERE o.waktu_pesanan >= DATE(NOW() - INTERVAL '90 days')
-AND o.waktu_pesanan <= :cutoff_date
-GROUP BY DATE(o.waktu_pesanan)
-ORDER BY tanggal
+
+```ts
+const revenueHistory = await prisma.transactionDetail.groupBy({
+  by: ['orderId'],
+  where: {
+    order: {
+      orderTime: {
+        gte: ninetyDaysAgo,
+        lte: cutoffDate,
+      },
+    },
+  },
+  _sum: {
+    totalPrice: true,
+    quantity: true,
+    discount: true,
+  },
+});
+```
 
 Field yang diambil:
 
@@ -173,15 +193,15 @@ Untuk setiap tanggal dalam rentang `cutoff_date + 1` sampai `cutoff_date + 7`
 
 for each date in [cutoff_date+1 ... cutoff_date+7]:
 // Dari DailyContext
-context = db.DailyContext.findUnique({ where: { date } })
+context = db.dailyContext.findUnique({ where: { date } })
 
 // Dari PromoCampaigns
-activePromos = db.PromoCampaigns.findMany({
-where: {
-status: 'aktif',
-startDate: { lte: date },
-endDate: { gte: date }
-}
+activePromos = db.promoCampaigns.findMany({
+  where: {
+    status: 'Active',
+    startDate: { lte: date },
+    endDate: { gte: date }
+  }
 })
 
 // Hitung metric promo
@@ -189,19 +209,19 @@ promoCount = activePromos.length
 meanDiscount = average(activePromos.map(p => p.discountValue))
 
 // Opsional: dari WeatherContext
-weather = db.WeatherContext.findFirst({
-where: { dateTime: { gte: date, lt: date+1 } }
+weather = db.weatherContext.findFirst({
+  where: { dateTime: { gte: date, lt: date + 1 } }
 })
 
 Field:
 
 - tanggal
-- apakah_libur
-- apakah_ramadhan
-- apakah_periode_gajian
+- is_holiday
+- is_ramadhan_periode
+- is_payday_periode
 - active_promo_count
 - active_promo_mean_discount
-- kondisi_cuaca
+- condition
 
 ## 6.3 Mapping `current_context`
 
@@ -216,17 +236,17 @@ Cara mengambil:
 currentDate = cutoff_date
 
 // Cek promo aktif
-activePromos = db.PromoCampaigns.findMany({
-where: {
-status: 'aktif',
-startDate: { lte: currentDate },
-endDate: { gte: currentDate }
-}
+activePromos = db.promoCampaigns.findMany({
+  where: {
+    status: 'Active',
+    startDate: { lte: currentDate },
+    endDate: { gte: currentDate }
+  }
 })
 
 // Cek daily context
-dailyContext = db.DailyContext.findUnique({
-where: { date: currentDate }
+dailyContext = db.dailyContext.findUnique({
+  where: { date: currentDate }
 })
 
 Field:
@@ -234,8 +254,8 @@ Field:
 - has_active_promo
 - active_promo_count
 - active_promo_mean_discount
-- apakah_libur
-- apakah_periode_gajian
+- is_holiday
+- is_payday_periode
 
 ---
 
@@ -331,11 +351,19 @@ Order.orderTime -> tanggal
 
 TransactionDetail.totalPrice -> revenue
 
-DailyContext.isHoliday -> apakah_libur
+TransactionDetail.quantity -> items_sold
 
-DailyContext.isPaydayPeriode -> apakah_periode_gajian
+TransactionDetail.discount -> discount_total
 
-PromoCampaigns.discountValue -> discount_value
+DailyContext.isHoliday -> is_holiday
+
+DailyContext.isRamadhanPeriode -> is_ramadhan_periode
+
+DailyContext.isPaydayPeriode -> is_payday_periode
+
+PromoCampaigns.discountValue -> active_promo_mean_discount
+
+WeatherContext.condition -> condition
 ```
 
 ---
