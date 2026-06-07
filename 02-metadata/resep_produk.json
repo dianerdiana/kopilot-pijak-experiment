@@ -1,0 +1,48 @@
+{
+    "description": "Mapping produk ke bahan baku.",
+    "grain": "1 baris per pasangan id_produk-id_bahan",
+    "primary_key": [
+        "id_produk",
+        "id_bahan"
+    ],
+    "foreign_keys": {
+        "id_produk": "produk.csv.id_produk",
+        "id_bahan": "bahan_baku.csv.id_bahan"
+    },
+    "columns": {
+        "id_produk": "Produk yang membutuhkan bahan.",
+        "id_bahan": "Bahan yang digunakan.",
+        "jumlah_dibutuhkan": "Jumlah bahan untuk 1 unit produk, mengikuti satuan bahan."
+    },
+    "row_count": 105,
+    "dtypes": {
+        "id_produk": "object",
+        "id_bahan": "object",
+        "jumlah_dibutuhkan": "float64"
+    },
+    "enum_values": {
+        "id_produk": [
+            "P001",
+            "P002",
+            "P003",
+            "P004",
+            "P005",
+            "P006",
+            "P007",
+            "P008",
+            "P009",
+            "P010",
+            "P011",
+            "P012",
+            "P013",
+            "P014",
+            "P015",
+            "P016",
+            "P017",
+            "P018",
+            "P019",
+            "P020",
+            "P021"
+        ]
+    }
+}
