@@ -33,7 +33,7 @@ Hasil prediksi disimpan ke tabel `predictions` melalui model `Prediction` pada `
 - `TransactionDetail`
 - `Order`
 - `Stock`
-- `StockReceipts`
+- `StockReceipt`
 - `RawMaterial`
 - `ProductIngredient`
 - `DailyContext`
@@ -46,7 +46,7 @@ Hasil prediksi disimpan ke tabel `predictions` melalui model `Prediction` pada `
 - produk aktif dari `Product`
 - histori penjualan dari `TransactionDetail` dan `Order`
 - stok saat ini dari `Stock`
-- stok bahan baku masuk dari `StockReceipts`
+- stok bahan baku masuk dari `StockReceipt`
 - konteks harian dari `DailyContext`
 - konteks promosi dari `PromoCampaigns`
 - konteks cuaca dari `WeatherContext` bila dipakai sebagai fitur tambahan internal
@@ -158,7 +158,7 @@ Mapping ke request ML:
 Langkahnya:
 
 1. ambil semua `ProductIngredient` untuk produk tersebut
-2. ambil `Stock.currentQuantity` untuk setiap `stockId`
+2. ambil `Stock.currentQuantity` untuk setiap bahan baku terkait
 3. ambil `quantityPerUnit` dari tiap bahan baku
 4. hitung kapasitas produk yang dapat dibuat oleh tiap bahan baku
 5. ambil nilai paling kecil dari semua hasil perhitungan
@@ -172,7 +172,7 @@ current_stock = min(capacityPerIngredient untuk semua bahan)
 
 ### 6.3 Cara menghitung `incoming_stock`
 
-`incoming_stock` diambil dari `StockReceipts`.
+`incoming_stock` diambil dari `StockReceipt`.
 
 Aturan:
 
@@ -265,7 +265,7 @@ Untuk membentuknya:
 
 Contoh sumber:
 
-- `PromoCampaigns.status = Active`
+- `PromoCampaigns.status = PromoStatus.Active`
 - `PromoCampaigns.startDate <= cutoff_date <= PromoCampaigns.endDate`
 - `PromoCampaigns.idProducts` atau `PromoCampaigns.categoryTarget`
 
@@ -320,7 +320,7 @@ Data dari database tidak dikirim mentah. Semuanya harus dimapping ke format yang
 
 ### 8.2 Prinsip mapping
 
-- database memakai camelCase sesuai Prisma
+- field Prisma memakai camelCase
 - request ML memakai snake_case
 - semua data perlu ditransformasi sebelum dikirim
 
@@ -390,7 +390,7 @@ Hasil prediksi disimpan ke model `Prediction` atau tabel `predictions`.
 ### 10.1 Mapping ke model Prediction
 
 - `id`: primary key
-- `type`: `DEMAND_FORECAST`
+- `type`: `DemandForecast`
 - `cutoffDate`: dari `cutoff_date` request
 - `forecastDays`: dari `forecast_days`
 - `modelVersion`: dari field `model` response ML
@@ -454,16 +454,16 @@ Data untuk frontend tidak diambil langsung dari response mentah ML. Data terlebi
 
 ### 12.1 Prinsip mapping ke frontend
 
-- data backend dan Prisma memakai camelCase
-- data response ML memakai snake_case
-- frontend menerima data camelCase agar konsisten dengan schema dan codebase
+- data backend dan Prisma memakai `camelCase`
+- data response ML memakai `snake_case`
+- frontend menerima data `camelCase` dengan istilah bahasa Inggris agar konsisten dengan schema dan codebase
 
 ### 12.2 Mapping response ML ke frontend
 
 Contoh mapping:
 
 - `id_produk` -> `productId`
-- `nama_produk` -> `name`
+- `nama_produk` -> `productName`
 - `kategori` -> `category`
 - `predicted_quantity_7d` -> `predictedQuantity7d`
 - `estimated_p90_quantity_7d` -> `estimatedP90Quantity7d`
@@ -471,20 +471,25 @@ Contoh mapping:
 - `suggested_restock_qty` -> `suggestedRestockQty`
 - `risk_level` -> `riskLevel`
 - `risk_score_pct` -> `riskScorePct`
+- `current_stock` -> `currentStock`
+- `incoming_stock` -> `incomingStock`
+- `history_days_used` -> `historyDaysUsed`
+- `current_promo_context_source` -> `currentPromoContextSource`
+- `daily_forecast` -> `dailyForecast`
 
-### 12.3 Analitik Produk
+### 12.3 Product Analytics
 
 Field yang dipakai:
 
-- `totalProdukAktif` -> jumlah `Product` dengan `isActive = true`
-- `volumeForecast` -> jumlah semua `predictedQuantity7d`
-- `potensiOmzet` -> jumlah `predictedQuantity7d * price`
-- `produkTerlaris` -> produk dengan `predictedQuantity7d` paling besar
-- `kategoriBreakdown` -> agregasi berdasarkan `Product.category`
+- `totalActiveProducts` -> jumlah `Product` dengan `isActive = true`
+- `forecastVolume` -> jumlah semua `predictedQuantity7d`
+- `revenuePotential` -> jumlah `predictedQuantity7d * price`
+- `topProduct` -> produk dengan `predictedQuantity7d` paling besar
+- `categoryBreakdown` -> agregasi berdasarkan `Product.category`
 
-### 12.4 Kategori Breakdown
+### 12.4 Category Breakdown
 
-Kategori harus mengikuti mapping Prisma:
+Kategori harus mengikuti value enum `ProductCategory` dari Prisma:
 
 - `kopi`
 - `non_kopi`
@@ -503,21 +508,21 @@ Bentuk data frontend:
 ];
 ```
 
-### 12.5 Tabel Produk
+### 12.5 Product Table
 
 Field tabel yang dipakai frontend:
 
-- `name`
+- `productName`
 - `category`
 - `price`
 - `demandForecast`
-- `potensiOmzet`
-- `terjual`
+- `revenuePotential`
+- `soldQuantity`
 - `status`
 
-### 12.6 Field `terjual`
+### 12.6 Field `soldQuantity`
 
-`terjual` tidak berasal dari response ML.
+`soldQuantity` tidak berasal dari response ML.
 
 Sumbernya:
 
@@ -621,7 +626,7 @@ Contoh error:
 - `Product` -> payload produk
 - `TransactionDetail` + `Order` -> histori penjualan
 - `Stock` -> stok aktif
-- `StockReceipts` -> incoming stock
+- `StockReceipt` -> incoming stock
 - `DailyContext` -> konteks kalender
 - `PromoCampaigns` -> konteks promo
 - `WeatherContext` -> konteks cuaca jika dipakai
