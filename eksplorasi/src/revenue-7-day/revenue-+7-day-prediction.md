@@ -198,7 +198,7 @@ context = db.dailyContext.findUnique({ where: { date } })
 // Dari PromoCampaigns
 activePromos = db.promoCampaigns.findMany({
   where: {
-    status: 'Active',
+    status: PromoStatus.Active,
     startDate: { lte: date },
     endDate: { gte: date }
   }
@@ -238,7 +238,7 @@ currentDate = cutoff_date
 // Cek promo aktif
 activePromos = db.promoCampaigns.findMany({
   where: {
-    status: 'Active',
+    status: PromoStatus.Active,
     startDate: { lte: currentDate },
     endDate: { gte: currentDate }
   }
