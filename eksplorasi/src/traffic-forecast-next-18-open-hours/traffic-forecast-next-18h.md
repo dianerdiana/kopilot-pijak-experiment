@@ -25,7 +25,7 @@ Hasil prediksi digunakan untuk:
 - perencanaan operasional
 - visualisasi diagram batang traffic per jam
 
-Hasil prediksi disimpan ke tabel `predictions` melalui model `Prediction` pada `schema.prisma` dengan tipe `TrafficForecast`.
+Hasil prediksi disimpan ke tabel `predictions` melalui model `Prediction` pada `schema.prisma` dengan tipe `PredictionType.TrafficForecast`.
 
 ---
 
@@ -57,7 +57,7 @@ Hasil prediksi disimpan ke tabel `predictions` melalui model `Prediction` pada `
 4. Data historis dihitung dan diaggregasi per jam operasional.
 5. Data dimapping ke format request ML.
 6. Request dikirim ke API Traffic Forecast.
-7. Response disimpan ke model `Prediction` dengan tipe `TrafficForecast`.
+7. Response disimpan ke model `Prediction` dengan tipe `PredictionType.TrafficForecast`.
 8. Ringkasan hasil dibuat untuk frontend.
 9. Sistem memicu notifikasi jika ada jam padat yang melebihi ambang batas.
 
@@ -191,7 +191,7 @@ Cara mengambil:
 ```ts
 const activePromos = await prisma.promoCampaigns.findMany({
   where: {
-    status: 'Active',
+    status: PromoStatus.Active,
     startDate: { lte: cutoffDateOnly },
     endDate: { gte: cutoffDateOnly },
   },
@@ -414,7 +414,7 @@ Hasil prediksi disimpan ke model `Prediction`.
 
 ## 10.1 Mapping ke Model Prediction
 
-- `type` = `TrafficForecast`
+- `type` = `PredictionType.TrafficForecast`
 - `cutoffDate`
 - `cutoffHour`
 - `forecastDays`
