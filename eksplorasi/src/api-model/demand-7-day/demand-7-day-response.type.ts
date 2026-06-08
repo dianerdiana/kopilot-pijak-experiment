@@ -1,4 +1,4 @@
-export interface Root {
+export interface Demand7DayResponse {
   request_id: string;
   model: string;
   forecast_days: number;
