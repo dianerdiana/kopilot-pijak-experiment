@@ -495,12 +495,12 @@ Bentuk data frontend:
 ```ts
 [
   {
-    category: "kopi",
+    category: 'kopi',
     revenuePotential: 0,
     totalDemand: 0,
-    productCount: 0
-  }
-]
+    productCount: 0,
+  },
+];
 ```
 
 ### 12.5 Tabel Produk
@@ -541,9 +541,9 @@ Contoh logika:
 
 ```ts
 if (dailyAvg > hotThreshold) {
-  status = "Hot";
+  status = 'Hot';
 } else if (dailyAvg < slowThreshold) {
-  status = "Slow";
+  status = 'Slow';
 }
 ```
 
@@ -647,4 +647,3 @@ Contoh error:
 - `normalizedSummary` sebaiknya dipakai untuk query cepat frontend
 - semua mapping perlu konsisten antara database, service, dan frontend
 - jika field baru ditambahkan ke response ML, cukup update mapper tanpa mengubah struktur inti
-
