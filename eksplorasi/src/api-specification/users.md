@@ -219,26 +219,24 @@ Digunakan untuk mengambil daftar user.
 {
   "success": true,
   "message": "User list fetched successfully",
-  "data": {
-    "items": [
-      {
-        "id": "c8bdc2d3-6c2e-4d52-a6c0-1db4dd6c61f2",
-        "userId": "USR-0001",
-        "name": "Budi Santoso",
-        "email": "budi@example.com",
-        "role": "super_admin",
-        "status": "aktif",
-        "createdAt": "2026-06-08T10:00:00.000Z",
-        "updatedAt": "2026-06-08T10:00:00.000Z",
-        "deletedAt": null
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "totalItems": 1,
-      "totalPages": 1
+  "data": [
+    {
+      "id": "c8bdc2d3-6c2e-4d52-a6c0-1db4dd6c61f2",
+      "userId": "USR-0001",
+      "name": "Budi Santoso",
+      "email": "budi@example.com",
+      "role": "super_admin",
+      "status": "aktif",
+      "createdAt": "2026-06-08T10:00:00.000Z",
+      "updatedAt": "2026-06-08T10:00:00.000Z",
+      "deletedAt": null
     }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 1,
+    "totalPages": 1
   }
 }
 ```

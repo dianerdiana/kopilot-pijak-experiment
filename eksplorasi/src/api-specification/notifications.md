@@ -198,24 +198,22 @@ Mengambil daftar notifikasi dalam bentuk card dengan pagination.
 {
   "success": true,
   "message": "Notification list fetched successfully",
-  "data": {
-    "items": [
-      {
-        "id": "7d27e5b0-5c97-4c0c-a7cf-0f6a9f4f71a2",
-        "time": "2026-06-08T10:00:00.000Z",
-        "title": "Stok mendekati habis",
-        "message": "Espresso Beans hanya cukup untuk 0,8 hari.",
-        "type": "peringatan_stok",
-        "status": "aktif",
-        "readStatus": "belum_dibaca"
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "totalItems": 1,
-      "totalPages": 1
+  "data": [
+    {
+      "id": "7d27e5b0-5c97-4c0c-a7cf-0f6a9f4f71a2",
+      "time": "2026-06-08T10:00:00.000Z",
+      "title": "Stok mendekati habis",
+      "message": "Espresso Beans hanya cukup untuk 0,8 hari.",
+      "type": "peringatan_stok",
+      "status": "aktif",
+      "readStatus": "belum_dibaca"
     }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 1,
+    "totalPages": 1
   }
 }
 ```

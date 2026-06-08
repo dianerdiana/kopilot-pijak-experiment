@@ -247,21 +247,19 @@ Mengambil data forecast untuk ditampilkan sebagai bar chart demand forecast per 
 {
   "success": true,
   "message": "Demand forecast fetched successfully",
-  "data": {
-    "forecastDays": 7,
-    "items": [
-      {
-        "category": "kopi",
-        "categoryLabel": "Coffee",
-        "unitsSold": 2118
-      },
-      {
-        "category": "non_kopi",
-        "categoryLabel": "Non Coffee",
-        "unitsSold": 540
-      }
-    ]
-  }
+  "forecastDays": 7,
+  "data": [
+    {
+      "category": "kopi",
+      "categoryLabel": "Coffee",
+      "unitsSold": 2118
+    },
+    {
+      "category": "non_kopi",
+      "categoryLabel": "Non Coffee",
+      "unitsSold": 540
+    }
+  ]
 }
 ```
 
@@ -289,19 +287,17 @@ Mengambil ranking kategori untuk ditampilkan sebagai progress bar.
 {
   "success": true,
   "message": "Category ranking fetched successfully",
-  "data": {
-    "items": [
-      {
-        "rank": 1,
-        "category": "kopi",
-        "categoryLabel": "Coffee",
-        "unitsSold": 2118,
-        "revenuePotential7d": 79100000,
-        "productCount": 18,
-        "progressPct": 100
-      }
-    ]
-  }
+  "data": [
+    {
+      "rank": 1,
+      "category": "kopi",
+      "categoryLabel": "Coffee",
+      "unitsSold": 2118,
+      "revenuePotential7d": 79100000,
+      "productCount": 18,
+      "progressPct": 100
+    }
+  ]
 }
 ```
 
@@ -323,25 +319,23 @@ Mengambil insight berbentuk card.
 {
   "success": true,
   "message": "Product insights fetched successfully",
-  "data": {
-    "items": [
-      {
-        "type": "top_category",
-        "title": "Kategori Terkuat",
-        "message": "Coffee mendominasi demand dengan 2.118 unit dan potensi omzet Rp 79,1 jt dalam 7 hari ke depan."
-      },
-      {
-        "type": "top_product",
-        "title": "Produk Unggulan",
-        "message": "Iced Hazelnut Macchiato Large adalah produk dengan forecast tertinggi sebesar 74 unit, potensi omzet Rp 2.590.000."
-      },
-      {
-        "type": "hot_product",
-        "title": "Produk Hot",
-        "message": "Terdapat 35 produk yang penjualannya jauh di atas rata-rata produk lainya. Pastikan stok bahan baku untuk menu-menu favorit ini selalu aman agar tidak kehilangan potensi transaksi."
-      }
-    ]
-  }
+  "data": [
+    {
+      "type": "top_category",
+      "title": "Kategori Terkuat",
+      "message": "Coffee mendominasi demand dengan 2.118 unit dan potensi omzet Rp 79,1 jt dalam 7 hari ke depan."
+    },
+    {
+      "type": "top_product",
+      "title": "Produk Unggulan",
+      "message": "Iced Hazelnut Macchiato Large adalah produk dengan forecast tertinggi sebesar 74 unit, potensi omzet Rp 2.590.000."
+    },
+    {
+      "type": "hot_product",
+      "title": "Produk Hot",
+      "message": "Terdapat 35 produk yang penjualannya jauh di atas rata-rata produk lainya. Pastikan stok bahan baku untuk menu-menu favorit ini selalu aman agar tidak kehilangan potensi transaksi."
+    }
+  ]
 }
 ```
 
@@ -386,25 +380,23 @@ Mengambil daftar 100 produk teratas berdasarkan confidence forecast.
 {
   "success": true,
   "message": "Top products fetched successfully",
-  "data": {
-    "items": [
-      {
-        "productId": "PRD-0001",
-        "name": "Iced Hazelnut Macchiato Large",
-        "category": "kopi",
-        "price": 35000,
-        "lowerBoundDemandForecast": 60,
-        "demandForecast": 74,
-        "upperBoundDemandForecast": 88,
-        "revenuePotential7d": 2590000,
-        "soldQuantity": 145,
-        "status": "Hot"
-      }
-    ],
-    "pagination": {
-      "limit": 100,
-      "totalItems": 100
+  "data": [
+    {
+      "productId": "PRD-0001",
+      "name": "Iced Hazelnut Macchiato Large",
+      "category": "kopi",
+      "price": 35000,
+      "lowerBoundDemandForecast": 60,
+      "demandForecast": 74,
+      "upperBoundDemandForecast": 88,
+      "revenuePotential7d": 2590000,
+      "soldQuantity": 145,
+      "status": "Hot"
     }
+  ],
+  "pagination": {
+    "limit": 100,
+    "totalItems": 100
   }
 }
 ```

@@ -221,19 +221,17 @@ Mengambil prioritas stock tertinggi untuk bar chart horizontal.
 {
   "success": true,
   "message": "Priority stock fetched successfully",
-  "data": {
-    "forecastDays": 7,
-    "items": [
-      {
-        "materialId": "MAT-0001",
-        "name": "Espresso Beans",
-        "currentStock": 24,
-        "coverageDays": 0.8,
-        "requiredStock7d": 60,
-        "priorityScore": 92
-      }
-    ]
-  }
+  "forecastDays": 7,
+  "data": [
+    {
+      "materialId": "MAT-0001",
+      "name": "Espresso Beans",
+      "currentStock": 24,
+      "coverageDays": 0.8,
+      "requiredStock7d": 60,
+      "priorityScore": 92
+    }
+  ]
 }
 ```
 
@@ -261,34 +259,32 @@ Mengambil ringkasan status stock untuk donut chart.
 {
   "success": true,
   "message": "Stock status breakdown fetched successfully",
-  "data": {
-    "items": [
-      {
-        "status": "aman",
-        "label": "Stock Aman",
-        "count": 64,
-        "percentage": 61.5
-      },
-      {
-        "status": "restock",
-        "label": "Perlu Restock",
-        "count": 28,
-        "percentage": 26.9
-      },
-      {
-        "status": "alert",
-        "label": "Item Kritis",
-        "count": 10,
-        "percentage": 9.6
-      },
-      {
-        "status": "habis",
-        "label": "Item Kritis",
-        "count": 2,
-        "percentage": 1.9
-      }
-    ]
-  }
+  "data": [
+    {
+      "status": "aman",
+      "label": "Stock Aman",
+      "count": 64,
+      "percentage": 61.5
+    },
+    {
+      "status": "restock",
+      "label": "Perlu Restock",
+      "count": 28,
+      "percentage": 26.9
+    },
+    {
+      "status": "alert",
+      "label": "Item Kritis",
+      "count": 10,
+      "percentage": 9.6
+    },
+    {
+      "status": "habis",
+      "label": "Item Kritis",
+      "count": 2,
+      "percentage": 1.9
+    }
+  ]
 }
 ```
 
@@ -334,24 +330,22 @@ Mengambil tabel status dan prediksi stock bahan baku.
 {
   "success": true,
   "message": "Stock table fetched successfully",
-  "data": {
-    "items": [
-      {
-        "materialId": "MAT-0001",
-        "name": "Espresso Beans",
-        "currentStock": 24,
-        "requiredStock7d": 60,
-        "coverageDays": 0.8,
-        "difference": -36,
-        "status": "alert"
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "totalItems": 1,
-      "totalPages": 1
+  "data": [
+    {
+      "materialId": "MAT-0001",
+      "name": "Espresso Beans",
+      "currentStock": 24,
+      "requiredStock7d": 60,
+      "coverageDays": 0.8,
+      "difference": -36,
+      "status": "alert"
     }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 1,
+    "totalPages": 1
   }
 }
 ```

@@ -233,17 +233,15 @@ Mengambil data tren pendapatan harian untuk 30 hari terakhir.
 {
   "success": true,
   "message": "Revenue trend fetched successfully",
-  "data": {
-    "days": 30,
-    "items": [
-      {
-        "date": "2026-06-01",
-        "revenue": 2500000,
-        "orderCount": 120,
-        "itemsSold": 260
-      }
-    ]
-  }
+  "days": 30,
+  "data": [
+    {
+      "date": "2026-06-01",
+      "revenue": 2500000,
+      "orderCount": 120,
+      "itemsSold": 260
+    }
+  ]
 }
 ```
 
@@ -281,17 +279,15 @@ Mengambil daftar produk terlaris untuk diagram batang.
 {
   "success": true,
   "message": "Top selling products fetched successfully",
-  "data": {
-    "days": 30,
-    "items": [
-      {
-        "productId": "PRD-0001",
-        "name": "Iced Hazelnut Macchiato Large",
-        "totalSold": 245,
-        "revenue": 8575000
-      }
-    ]
-  }
+  "days": 30,
+  "data": [
+    {
+      "productId": "PRD-0001",
+      "name": "Iced Hazelnut Macchiato Large",
+      "totalSold": 245,
+      "revenue": 8575000
+    }
+  ]
 }
 ```
 
@@ -326,26 +322,24 @@ Mengambil data traffic hour untuk kebutuhan chart jam sibuk.
 {
   "success": true,
   "message": "Traffic hour fetched successfully",
-  "data": {
-    "source": "forecast",
-    "forecastOpenSlots": 18,
-    "peakWindow": {
-      "startTime": "2026-06-08T11:00:00Z",
-      "endTime": "2026-06-08T13:00:00Z",
-      "maxPredictedOrderCount": 45
-    },
-    "items": [
-      {
-        "predictionTime": "2026-06-08T11:00:00Z",
-        "predictionHour": 11,
-        "forecastOpenSlot": 1,
-        "predictedOrderCount": 45,
-        "lowerBound": 38,
-        "upperBound": 53,
-        "trafficLevel": "High"
-      }
-    ]
-  }
+  "source": "forecast",
+  "forecastOpenSlots": 18,
+  "peakWindow": {
+    "startTime": "2026-06-08T11:00:00Z",
+    "endTime": "2026-06-08T13:00:00Z",
+    "maxPredictedOrderCount": 45
+  },
+  "data": [
+    {
+      "predictionTime": "2026-06-08T11:00:00Z",
+      "predictionHour": 11,
+      "forecastOpenSlot": 1,
+      "predictedOrderCount": 45,
+      "lowerBound": 38,
+      "upperBound": 53,
+      "trafficLevel": "High"
+    }
+  ]
 }
 ```
 
@@ -373,22 +367,20 @@ Mengambil kontribusi penjualan per kategori untuk donut chart.
 {
   "success": true,
   "message": "Category contribution fetched successfully",
-  "data": {
-    "items": [
-      {
-        "category": "kopi",
-        "categoryLabel": "Coffee",
-        "revenue": 62000000,
-        "percentage": 49.6
-      },
-      {
-        "category": "non_kopi",
-        "categoryLabel": "Non Coffee",
-        "revenue": 35000000,
-        "percentage": 28
-      }
-    ]
-  }
+  "data": [
+    {
+      "category": "kopi",
+      "categoryLabel": "Coffee",
+      "revenue": 62000000,
+      "percentage": 49.6
+    },
+    {
+      "category": "non_kopi",
+      "categoryLabel": "Non Coffee",
+      "revenue": 35000000,
+      "percentage": 28
+    }
+  ]
 }
 ```
 
@@ -428,28 +420,26 @@ Mengambil riwayat transaksi untuk tabel.
 {
   "success": true,
   "message": "Transaction history fetched successfully",
-  "data": {
-    "items": [
-      {
-        "orderId": "ORD-0001",
-        "orderTime": "2026-06-08T10:15:00.000Z",
-        "productsText": "2x Iced Hazelnut Macchiato Large, 1x Chocolate Croissant",
-        "items": [
-          {
-            "productId": "PRD-0001",
-            "name": "Iced Hazelnut Macchiato Large",
-            "quantity": 2
-          }
-        ],
-        "totalPrice": 105000
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "totalItems": 1,
-      "totalPages": 1
+  "data": [
+    {
+      "orderId": "ORD-0001",
+      "orderTime": "2026-06-08T10:15:00.000Z",
+      "productsText": "2x Iced Hazelnut Macchiato Large, 1x Chocolate Croissant",
+      "items": [
+        {
+          "productId": "PRD-0001",
+          "name": "Iced Hazelnut Macchiato Large",
+          "quantity": 2
+        }
+      ],
+      "totalPrice": 105000
     }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 1,
+    "totalPages": 1
   }
 }
 ```
