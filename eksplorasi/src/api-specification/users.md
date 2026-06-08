@@ -178,7 +178,7 @@ Digunakan untuk membuat user baru.
     "name": "Budi Santoso",
     "email": "budi@example.com",
     "role": "manager",
-  "status": "aktif",
+    "status": "aktif",
     "createdAt": "2026-06-08T10:00:00.000Z",
     "updatedAt": "2026-06-08T10:00:00.000Z",
     "deletedAt": null
@@ -227,7 +227,7 @@ Digunakan untuk mengambil daftar user.
         "name": "Budi Santoso",
         "email": "budi@example.com",
         "role": "super_admin",
-  "status": "aktif",
+        "status": "aktif",
         "createdAt": "2026-06-08T10:00:00.000Z",
         "updatedAt": "2026-06-08T10:00:00.000Z",
         "deletedAt": null
@@ -266,7 +266,7 @@ Mengambil detail user berdasarkan `id`.
     "name": "Budi Santoso",
     "email": "budi@example.com",
     "role": "super_admin",
-  "status": "aktif",
+    "status": "aktif",
     "createdAt": "2026-06-08T10:00:00.000Z",
     "updatedAt": "2026-06-08T10:00:00.000Z",
     "deletedAt": null
@@ -322,7 +322,7 @@ Mengupdate data user.
     "name": "Budi Santoso",
     "email": "budi@example.com",
     "role": "manager",
-  "status": "aktif",
+    "status": "aktif",
     "createdAt": "2026-06-08T10:00:00.000Z",
     "updatedAt": "2026-06-08T11:00:00.000Z",
     "deletedAt": null
