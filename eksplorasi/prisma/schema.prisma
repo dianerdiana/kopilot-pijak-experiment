@@ -14,8 +14,8 @@ enum UserRole {
 }
 
 enum UserStatus {
-  Active
-  Inactive
+  Active   @map("aktif")
+  Inactive @map("tidak_aktif")
 }
 
 enum StockUnit {
