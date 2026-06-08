@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider     = "prisma-client"
   output       = "../generated/prisma"
@@ -13,7 +8,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// Enums
 enum UserRole {
   SuperAdmin @map("super_admin")
   Manager    @map("manager")
@@ -26,15 +20,14 @@ enum UserStatus {
 
 enum StockUnit {
   ml
-  gr
+  gr  @map("gram")
   pcs
 }
 
 enum PredictionType {
-  RevenueForecast      @map("revenue_forecast")
-  TrafficForecast      @map("traffic_forecast")
-  DemandForecast       @map("demand_forecast")
-  DemandRecommendation @map("demand_recommendation")
+  RevenueForecast @map("revenue_forecast")
+  TrafficForecast @map("traffic_forecast")
+  DemandForecast  @map("demand_forecast")
 }
 
 enum ProductCategory {
@@ -44,14 +37,14 @@ enum ProductCategory {
 }
 
 enum ProductVariant {
-  Bottle @map("botol")
+  Bottle @map("botolan")
   Cool   @map("dingin")
   Hot    @map("panas")
   Food   @map("makanan")
 }
 
 enum ProductSize {
-  Large         @map("besar")
+  Large         @map("large")
   Regular       @map("regular")
   Single        @map("satuan")
   BottleRegular @map("500ml")
@@ -93,12 +86,13 @@ enum OrderType {
 }
 
 enum SalesChannel {
-  Offline @map("offline")
-  Online  @map("online")
+  Offline       @map("offline")
+  Online        @map("online")
+  OfflineOnline @map("offline_online")
 }
 
 enum CustomerSegment {
-  TeacherWorker    @map("dosen_staff")
+  TeacherWorker    @map("dosen_staf")
   Student          @map("mahasiswa")
   LocalWorker      @map("pekerja_sekitar")
   DeliveryCustomer @map("pelanggan_delivery")
@@ -145,7 +139,28 @@ enum NotificationStatus {
   Archived @map("diarsipkan")
 }
 
-// Models
+enum WeatherCondition {
+  Sunny     @map("cerah")
+  Cloudy    @map("berawan")
+  LightRain @map("hujan_ringan")
+  HeavyRain @map("hujan_deras")
+}
+
+enum RamadhanPeriod {
+  None       @map("tidak_ada")
+  FastingDay @map("siang_puasa")
+  IftarPeak  @map("puncak_buka_puasa")
+  AfterIftar @map("setelah_buka_puasa")
+}
+
+enum EventType {
+  None             @map("tidak_ada")
+  LocalEvent       @map("acara_lokal")
+  NationalHoliday  @map("libur_nasional")
+  ReligiousHoliday @map("libur_keagamaan")
+  ReligiousPeriod  @map("periode_keagamaan")
+}
+
 model User {
   id                String             @id @default(uuid())
   userId            String             @unique @map("id_user")
@@ -164,12 +179,12 @@ model User {
 
 model Product {
   id        String          @id @default(uuid())
-  productId String          @unique @map("product_id")
-  name      String
-  variant   ProductVariant
-  category  ProductCategory
-  size      ProductSize
-  price     Decimal         @db.Decimal(10, 2)
+  productId String          @unique @map("id_produk")
+  name      String          @map("nama_produk")
+  variant   ProductVariant  @map("varian")
+  category  ProductCategory @map("kategori")
+  size      ProductSize     @map("ukuran")
+  price     Decimal         @map("harga_dasar") @db.Decimal(10, 2)
   isActive  Boolean         @default(true) @map("is_active")
   createdAt DateTime        @default(now()) @map("created_at")
   updatedAt DateTime        @updatedAt @map("updated_at")
@@ -179,20 +194,21 @@ model Product {
 
   @@unique([variant, category, size])
   @@index([productId])
-  @@map("products")
+  @@map("produk")
 }
 
 model ProductIngredient {
   id              String  @id @default(uuid())
-  productId       String  @map("product_id")
-  stockId         String  @map("stock_id")
-  quantityPerUnit Decimal @map("quantity_per_unit") @db.Decimal(10, 3)
+  productId       String  @map("id_produk")
+  materialId      String  @map("id_bahan")
+  quantityPerUnit Decimal @map("jumlah_dibutuhkan") @db.Decimal(10, 3)
 
-  product Product @relation(fields: [productId], references: [productId])
-  stock   Stock   @relation(fields: [stockId], references: [stockId])
+  product     Product     @relation(fields: [productId], references: [productId])
+  rawMaterial RawMaterial @relation(fields: [materialId], references: [materialId])
 
-  @@unique([productId, stockId])
-  @@map("product_ingredients")
+  @@unique([productId, materialId])
+  @@index([materialId])
+  @@map("resep_produk")
 }
 
 model RawMaterial {
@@ -202,17 +218,19 @@ model RawMaterial {
   unit                  StockUnit    @map("satuan")
   pricePerUnit          Decimal      @map("biaya_per_satuan") @db.Decimal(10, 2)
   supplier              SupplierType @map("jenis_pemasok")
-  unOpenedShelfLifeDays Int          @map("umur_simpan_belum_dibuka_hari") // in days
-  openedShelfLifeDays   Int          @map("umur_simpan_sudah_dibuka_hari")
+  unOpenedShelfLifeDays Int          @map("umur_simpan_belum_dibuka_hari")
+  openedShelfLifeDays   Int          @map("umur_simpan_setelah_dibuka_hari")
   storageType           StorageType  @map("jenis_penyimpanan")
-  reorderPoint          Int          @map("reorder_point")
+  reorderPoint          Int          @map("titik_pemesanan_ulang")
   createdAt             DateTime     @default(now()) @map("created_at")
   updatedAt             DateTime     @updatedAt @map("updated_at")
 
-  stocks        Stock[]
-  stockReceipts StockReceipts[]
+  stocks              Stock[]
+  stockReceipts       StockReceipt[]
+  productIngredients  ProductIngredient[]
+  dailyStockSnapshots DailyStockSnapshot[]
 
-  @@map("raw_materials")
+  @@map("bahan_baku")
 }
 
 model Stock {
@@ -225,23 +243,21 @@ model Stock {
   status          StockStatus @default(Sufficient)
   lastUpdated     DateTime    @map("last_updated")
 
-  productIngredients  ProductIngredient[]
-  rawMaterial         RawMaterial          @relation(fields: [materialId], references: [materialId])
-  dailyStockSnapshots DailyStockSnapshot[]
+  rawMaterial RawMaterial @relation(fields: [materialId], references: [materialId])
 
+  @@index([materialId])
   @@map("stocks")
 }
 
-model StockReceipts {
+model StockReceipt {
   id                 String    @id @default(uuid())
   receiptId          String    @unique @map("id_penerimaan")
   materialId         String    @map("id_bahan")
-  totalQuantity      Int       @map("jumlah_diterima")
-  pricePerUnit       Decimal   @map("biaya_per_satuan") @db.Decimal(10, 2)
+  receivedQuantity   Decimal   @map("jumlah_diterima") @db.Decimal(12, 3)
+  pricePerUnit       Decimal   @map("biaya_per_satuan") @db.Decimal(12, 3)
   receiptDate        DateTime  @map("tanggal_penerimaan") @db.Date
   supplierName       String    @map("nama_pemasok")
   batchId            String    @map("id_batch")
-  remainingStock     Int       @map("sisa_stock_batch")
   openedDate         DateTime? @map("tanggal_dibuka") @db.Date
   expiryUnopenedDate DateTime? @map("tanggal_expired_belum_dibuka") @db.Date
   expiryOpenedDate   DateTime? @map("tanggal_expired_setelah_dibuka") @db.Date
@@ -249,39 +265,45 @@ model StockReceipts {
 
   rawMaterial RawMaterial @relation(fields: [materialId], references: [materialId])
 
-  @@map("stock_receipts")
+  @@index([materialId])
+  @@index([receiptDate])
+  @@map("penerimaan_stok")
 }
 
 model DailyStockSnapshot {
   id             String   @id @default(uuid())
-  stockId        String   @map("stock_id")
-  beginningStock Int      @map("stock_awal")
-  stockIn        Int      @map("stock_masuk")
-  usedStock      Int      @map("stock_terpakai")
-  wastedStock    Int      @map("stock_terbuang")
-  endingStock    Int      @map("stock_akhir")
+  materialId     String   @map("id_bahan")
+  beginningStock Decimal  @map("stok_awal") @db.Decimal(12, 3)
+  stockIn        Decimal  @map("stok_masuk") @db.Decimal(12, 3)
+  usedStock      Decimal  @map("stok_terpakai") @db.Decimal(12, 3)
+  wastedStock    Decimal  @map("stok_terbuang") @db.Decimal(12, 3)
+  endingStock    Decimal  @map("stok_akhir") @db.Decimal(12, 3)
   flagOutOfStock Boolean  @map("flag_stok_habis")
   flagNearExpiry Boolean  @map("flag_hampir_expired")
-  snapshotDate   DateTime @map("tanggal_snapshot") @db.Date
+  snapshotDate   DateTime @map("tanggal") @db.Date
 
-  stock Stock @relation(fields: [stockId], references: [stockId])
+  rawMaterial RawMaterial @relation(fields: [materialId], references: [materialId])
 
-  @@map("daily_stock_snapshots")
+  @@unique([snapshotDate, materialId])
+  @@index([materialId])
+  @@map("snapshot_stok_harian")
 }
 
 model Order {
-  id                       String              @id @default(uuid())
-  orderId                  String              @unique @map("id_pesanan")
-  orderTime                DateTime            @map("waktu_pesanan")
-  paymentMethod            PaymentMethod       @map("metode_pembayaran")
-  orderType                OrderType           @map("jenis_pesanan")
-  salesChannel             SalesChannel        @map("kanal_penjualan")
-  estimatedCustomerSegment CustomerSegment     @map("segmen_pelanggan_estimasi")
-  createdAt                DateTime            @default(now()) @map("created_at")
-  updatedAt                DateTime            @updatedAt @map("updated_at")
-  transactionDetails       TransactionDetail[]
+  id                       String          @id @default(uuid())
+  orderId                  String          @unique @map("id_pesanan")
+  orderTime                DateTime        @map("waktu_pesanan")
+  paymentMethod            PaymentMethod   @map("metode_pembayaran")
+  orderType                OrderType       @map("jenis_pesanan")
+  salesChannel             SalesChannel    @map("kanal_penjualan")
+  estimatedCustomerSegment CustomerSegment @map("segmen_pelanggan_estimasi")
+  createdAt                DateTime        @default(now()) @map("created_at")
+  updatedAt                DateTime        @updatedAt @map("updated_at")
 
-  @@map("orders")
+  transactionDetails TransactionDetail[]
+
+  @@index([orderTime])
+  @@map("pesanan")
 }
 
 model TransactionDetail {
@@ -290,17 +312,20 @@ model TransactionDetail {
   orderId         String       @map("id_pesanan")
   productId       String       @map("id_produk")
   quantity        Int          @map("jumlah")
-  price           Decimal      @map("harga_satuan") @db.Decimal(10, 2)
-  discount        Decimal      @map("jumlah_diskon") @db.Decimal(10, 2)
+  price           Decimal      @map("harga_satuan") @db.Decimal(12, 2)
+  discount        Decimal      @map("jumlah_diskon") @db.Decimal(12, 2)
   discountApplied Boolean      @default(false) @map("diskon_diterapkan")
   discountType    DiscountType @default(None) @map("jenis_diskon")
-  totalPrice      Decimal      @map("total_harga") @db.Decimal(10, 2)
+  totalPrice      Decimal      @map("total_harga") @db.Decimal(12, 2)
   promotionId     String       @default("tidak_ada") @map("id_promo")
 
   order   Order   @relation(fields: [orderId], references: [orderId])
   product Product @relation(fields: [productId], references: [productId])
 
-  @@map("transaction_details")
+  @@index([orderId])
+  @@index([productId])
+  @@index([promotionId])
+  @@map("detail_transaksi")
 }
 
 model Prediction {
@@ -314,29 +339,30 @@ model Prediction {
   normalizedSummary Json           @map("normalized_summary")
   generatedAt       DateTime       @default(now()) @map("generated_at")
 
+  @@index([type, cutoffDate])
   @@map("predictions")
 }
 
 model WeatherContext {
-  id              Int      @id @default(autoincrement())
-  dateTime        DateTime @default(now()) @map("waktu_jam")
-  condition       String   @map("kondisi_cuaca")
-  ramadhanPeriode Boolean  @map("periode_ramadhan")
+  id             Int              @id @default(autoincrement())
+  dateTime       DateTime         @unique @map("waktu_jam")
+  condition      WeatherCondition @map("kondisi_cuaca")
+  ramadhanPeriod RamadhanPeriod   @default(None) @map("periode_ramadan")
 
-  @@map("weather_context")
+  @@map("konteks_jam")
 }
 
 model DailyContext {
-  id                Int      @id @default(autoincrement())
-  date              DateTime @default(now()) @map("tanggal")
-  isHoliday         Boolean  @map("apakah_libur")
-  isWeekend         Boolean  @map("apakah_akhir_pekan")
-  isRamadhanPeriode Boolean  @map("apakah_ramadhan")
-  isPaydayPeriode   Boolean  @map("apakah_periode_gajian")
-  eventName         String   @default("tidak_ada") @map("nama_event")
-  eventType         String   @default("tidak_ada") @map("jenis_event")
+  id                Int       @id @default(autoincrement())
+  date              DateTime  @default(now()) @map("tanggal") @db.Date
+  isHoliday         Boolean   @map("apakah_libur")
+  isWeekend         Boolean   @map("apakah_akhir_pekan")
+  isRamadhanPeriode Boolean   @map("apakah_ramadan")
+  isPaydayPeriode   Boolean   @map("apakah_periode_gajian")
+  eventName         String    @default("tidak_ada") @map("nama_event")
+  eventType         EventType @default(None) @map("jenis_event")
 
-  @@map("daily_context")
+  @@map("konteks_harian")
 }
 
 model Notification {
@@ -355,6 +381,7 @@ model Notification {
 
   notificationReads NotificationRead[]
 
+  @@index([status, validUntil])
   @@map("notifications")
 }
 
@@ -368,6 +395,7 @@ model NotificationRead {
   user         User         @relation(fields: [userId], references: [id])
 
   @@unique([notificationId, userId])
+  @@index([userId])
   @@map("notification_reads")
 }
 
@@ -378,14 +406,15 @@ model PromoCampaigns {
   startDate      DateTime     @map("tanggal_mulai") @db.Date
   endDate        DateTime     @map("tanggal_selesai") @db.Date
   discountType   DiscountType @map("jenis_diskon")
-  idProducts     String       @map("id_produk_target") // Sparated by semicoolon, e.g. "prod1;prod2;prod3"
-  categoryTarget String       @map("kategori_target") // if all categories, set to "semua"
+  idProducts     String       @map("id_produk_target")
+  categoryTarget String       @map("kategori_target")
   discountValue  Decimal      @map("nilai_diskon") @db.Decimal(10, 2)
   salesChannel   SalesChannel @map("kanal_penjualan")
-  minimumUnit    Int          @map("minimal_pembelian")
+  minimumUnit    String       @map("minimal_pembelian")
   status         PromoStatus  @map("status_promo")
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
 
-  @@map("promo_campaigns")
+  @@index([startDate, endDate])
+  @@map("kampanye_promo")
 }
